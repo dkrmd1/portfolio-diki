@@ -7,6 +7,8 @@ Website statis responsif untuk GitHub Pages. Tidak memerlukan framework atau pro
 - Ringkasan profil dan teknologi
 - Grafik jumlah proyek untuk tiap teknologi, diperbarui otomatis dari tag proyek
 - Daftar repositori publik yang diperbarui dari GitHub API saat halaman dibuka
+- Navigasi proyek per halaman dengan tombol sebelumnya dan berikutnya
+- Tema robot futuristis dengan ilustrasi robot dan cuplikan kode
 - Statistik jumlah repositori dan stars publik
 - Repo private tidak dimuat, ditampilkan, atau ditautkan; kartu proyek tidak memiliki tautan keluar
 - Animasi saat menggulir, navigasi responsif, dan dukungan reduced motion

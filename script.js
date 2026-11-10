@@ -26,15 +26,17 @@ function updateSkillChart() {
   const summary = document.getElementById("skillChartSummary");
   if (!projectGrid || !chart || !summary) return;
 
-  const projects = [...projectGrid.querySelectorAll(".project-card")];
+  const projects = publicRepos.length
+    ? publicRepos
+    : [...projectGrid.querySelectorAll(".project-card")];
   const technologyCounts = new Map();
 
   projects.forEach((project) => {
-    const technologies = new Set(
-      [...project.querySelectorAll(".project-footer .tags span")]
+    const technologies = new Set(project.name
+      ? getRepositoryTechnologies(project)
+      : [...project.querySelectorAll(".project-footer .tags span")]
         .map((tag) => tag.textContent.trim())
-        .filter(Boolean)
-    );
+        .filter(Boolean));
 
     technologies.forEach((technology) => {
       const key = technology.toLocaleLowerCase();
@@ -117,6 +119,12 @@ const projectNote = document.querySelector(".project-note");
 const githubStatus = document.getElementById("githubStatus");
 const repoCount = document.getElementById("repoCount");
 const starCount = document.getElementById("starCount");
+const previousProjects = document.getElementById("previousProjects");
+const nextProjects = document.getElementById("nextProjects");
+const projectPageIndicator = document.getElementById("projectPageIndicator");
+const projectsPerPage = 3;
+let publicRepos = [];
+let currentProjectPage = 0;
 
 const projectHighlights = {
   "sistem-berita-acara": {
@@ -135,6 +143,12 @@ const projectHighlights = {
     technologies: ["Laravel", "PHP"]
   }
 };
+
+function getRepositoryTechnologies(repo) {
+  const highlight = projectHighlights[repo.name];
+  if (highlight) return highlight.technologies;
+  return repo.language ? [repo.language] : [];
+}
 
 function createProjectCard(repo, index) {
   const highlight = projectHighlights[repo.name];
@@ -178,6 +192,51 @@ function createProjectCard(repo, index) {
   return card;
 }
 
+function renderProjectPage() {
+  if (!projectGrid) return;
+
+  const pageCount = Math.max(1, Math.ceil(publicRepos.length / projectsPerPage));
+  currentProjectPage = Math.min(currentProjectPage, pageCount - 1);
+  const firstIndex = currentProjectPage * projectsPerPage;
+  const visibleRepos = publicRepos.slice(firstIndex, firstIndex + projectsPerPage);
+
+  projectGrid.replaceChildren(...visibleRepos.map((repo, index) => createProjectCard(
+    { ...repo, totalCount: publicRepos.length },
+    firstIndex + index
+  )));
+  if (previousProjects) previousProjects.disabled = currentProjectPage === 0;
+  if (nextProjects) nextProjects.disabled = currentProjectPage >= pageCount - 1;
+  if (projectPageIndicator) {
+    projectPageIndicator.textContent = `Halaman ${currentProjectPage + 1} / ${pageCount}`;
+  }
+  if (projectStatus) {
+    if (publicRepos.length === 0) {
+      projectStatus.textContent = "Belum ada repositori publik.";
+    } else {
+      const lastIndex = Math.min(firstIndex + visibleRepos.length, publicRepos.length);
+      projectStatus.textContent = `Menampilkan ${firstIndex + 1}–${lastIndex} dari ${publicRepos.length} repo publik.`;
+    }
+  }
+  updateSkillChart();
+  initScrollAnimations();
+}
+
+if (previousProjects) {
+  previousProjects.addEventListener("click", () => {
+    if (currentProjectPage === 0) return;
+    currentProjectPage -= 1;
+    renderProjectPage();
+  });
+}
+
+if (nextProjects) {
+  nextProjects.addEventListener("click", () => {
+    if (currentProjectPage >= Math.ceil(publicRepos.length / projectsPerPage) - 1) return;
+    currentProjectPage += 1;
+    renderProjectPage();
+  });
+}
+
 async function fetchPublicRepos() {
   const repos = [];
   let page = 1;
@@ -196,24 +255,15 @@ async function fetchPublicRepos() {
       page += 1;
     }
 
-    const publicRepos = repos.filter((repo) => repo && repo.private === false);
+    publicRepos = repos.filter((repo) => repo && repo.private === false);
     publicRepos.sort((first, second) => new Date(second.updated_at) - new Date(first.updated_at));
-    if (projectGrid) {
-      projectGrid.replaceChildren(...publicRepos.map((repo, index) => createProjectCard(
-        { ...repo, totalCount: publicRepos.length },
-        index
-      )));
-      initScrollAnimations();
-    }
+    renderProjectPage();
 
     if (repoCount) repoCount.textContent = String(publicRepos.length);
     if (starCount) {
       starCount.textContent = String(publicRepos.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0));
     }
     if (githubStatus) githubStatus.textContent = "Statistik hanya dari repositori publik.";
-    if (projectStatus) {
-      projectStatus.textContent = `${publicRepos.length} repositori publik ditampilkan.`;
-    }
     if (projectNote) {
       projectNote.textContent = "Daftar diperbarui otomatis saat halaman dibuka. Hanya repositori publik yang dimuat; repositori private tidak diakses atau ditampilkan.";
     }
@@ -229,8 +279,4 @@ async function fetchPublicRepos() {
 
 updateSkillChart();
 initScrollAnimations();
-if (projectGrid) {
-  const projectObserver = new MutationObserver(updateSkillChart);
-  projectObserver.observe(projectGrid, { childList: true, subtree: true, characterData: true });
-}
 fetchPublicRepos();
