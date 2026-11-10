@@ -5,7 +5,7 @@ Website statis responsif untuk GitHub Pages. Tidak memerlukan framework atau pro
 ## Isi
 
 - Ringkasan profil dan teknologi
-- Logo teknologi Laravel, PHP, HTML, Bootstrap, CSS, JavaScript, MySQL, dan Flutter
+- Logo SVG teknologi Laravel, PHP, HTML, Bootstrap, CSS, JavaScript, MySQL, dan Flutter (Simple Icons, disimpan lokal)
 - Grafik teknologi yang dihitung hanya dari repositori publik
 - Game cacing yang dimainkan langsung di halaman dengan keyboard atau kontrol sentuh
 - Daftar repositori publik yang diperbarui dari GitHub API saat halaman dibuka
