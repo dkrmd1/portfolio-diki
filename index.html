@@ -100,14 +100,37 @@
             <div class="tags"><span>Flutter</span><span>Java</span><span>Python</span></div>
           </article>
         </div>
-        <div class="skill-chart-panel">
-          <div class="skill-chart-heading">
-            <div><p class="eyebrow">JEJAK TEKNOLOGI</p><h3>Teknologi dalam repo publik</h3></div>
-            <p class="skill-chart-summary" id="skillChartSummary" role="status">Menghitung teknologi dari proyek…</p>
+        <div class="snake-game-panel">
+          <div class="snake-game-heading">
+            <div><p class="eyebrow">MINI GAME / 01</p><h3>Dev Snake</h3><p class="snake-game-intro">Makan byte, kumpulkan skor, jangan sampai menabrak!</p></div>
+            <div class="snake-scoreboard" aria-label="Skor permainan">
+              <div><span>SKOR</span><strong id="snakeScore">0</strong></div>
+              <div><span>TERBAIK</span><strong id="snakeBest">0</strong></div>
+            </div>
           </div>
-          <div class="skill-chart" id="skillChart" role="list" aria-label="Jumlah proyek pilihan berdasarkan teknologi"></div>
+          <div class="snake-game-layout">
+            <div class="snake-screen">
+              <canvas id="snakeCanvas" width="480" height="320" tabindex="0" aria-label="Arena game cacing. Fokuskan arena lalu gunakan tombol panah atau WASD untuk bergerak." aria-describedby="snakeHelp"></canvas>
+              <p class="snake-game-status" id="snakeStatus" role="status">Tekan Mulai untuk bermain.</p>
+            </div>
+            <div class="snake-game-sidebar">
+              <p class="snake-code-label"><span aria-hidden="true">&gt;_</span> PLAYER CONTROL</p>
+              <p class="snake-help" id="snakeHelp">Gunakan tombol panah atau WASD. Di ponsel, gunakan tombol arah.</p>
+              <div class="snake-pad" aria-label="Kontrol arah game">
+                <button type="button" class="snake-direction" data-direction="up" aria-label="Gerak ke atas">↑</button>
+                <button type="button" class="snake-direction" data-direction="left" aria-label="Gerak ke kiri">←</button>
+                <button type="button" class="snake-direction" data-direction="down" aria-label="Gerak ke bawah">↓</button>
+                <button type="button" class="snake-direction" data-direction="right" aria-label="Gerak ke kanan">→</button>
+              </div>
+              <div class="snake-actions">
+                <button class="button button-dark snake-action" id="snakeStart" type="button">Mulai game <span aria-hidden="true">▶</span></button>
+                <button class="button button-light snake-action" id="snakePause" type="button" disabled>Jeda</button>
+                <button class="snake-reset" id="snakeReset" type="button">Ulangi game</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <p class="skill-footnote">Java dan Python dicantumkan sebagai teknologi yang ingin dikembangkan, bukan klaim tingkat kemahiran.</p>
+        <p class="skill-footnote">Game berjalan langsung di browser dan tidak mengirimkan data permainan ke mana pun.</p>
       </section>
 
       <section class="projects section" id="projects">

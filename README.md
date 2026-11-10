@@ -5,7 +5,7 @@ Website statis responsif untuk GitHub Pages. Tidak memerlukan framework atau pro
 ## Isi
 
 - Ringkasan profil dan teknologi
-- Grafik jumlah proyek untuk tiap teknologi, diperbarui otomatis dari tag proyek
+- Game cacing yang dimainkan langsung di halaman dengan keyboard atau kontrol sentuh
 - Daftar repositori publik yang diperbarui dari GitHub API saat halaman dibuka
 - Navigasi proyek per halaman dengan tombol sebelumnya dan berikutnya
 - Font game pada judul dan navigasi, kartu proyek bergaya kartu game, serta profil yang bisa digeser dengan mouse/sentuhan

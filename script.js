@@ -20,72 +20,219 @@ if (menuToggle && mainNav) {
 const year = document.getElementById("year");
 if (year) year.textContent = new Date().getFullYear();
 
-function updateSkillChart() {
-  const projectGrid = document.querySelector(".project-grid");
-  const chart = document.getElementById("skillChart");
-  const summary = document.getElementById("skillChartSummary");
-  if (!projectGrid || !chart || !summary) return;
+function initSnakeGame() {
+  const canvas = document.getElementById("snakeCanvas");
+  const scoreElement = document.getElementById("snakeScore");
+  const bestElement = document.getElementById("snakeBest");
+  const status = document.getElementById("snakeStatus");
+  const startButton = document.getElementById("snakeStart");
+  const pauseButton = document.getElementById("snakePause");
+  const resetButton = document.getElementById("snakeReset");
+  if (!canvas || !scoreElement || !bestElement || !status || !startButton || !pauseButton || !resetButton) return;
 
-  const projects = publicRepos.length
-    ? publicRepos
-    : [...projectGrid.querySelectorAll(".project-card")];
-  const technologyCounts = new Map();
-
-  projects.forEach((project) => {
-    const technologies = new Set(project.name
-      ? getRepositoryTechnologies(project)
-      : [...project.querySelectorAll(".project-footer .tags span")]
-        .map((tag) => tag.textContent.trim())
-        .filter(Boolean));
-
-    technologies.forEach((technology) => {
-      const key = technology.toLocaleLowerCase();
-      const current = technologyCounts.get(key);
-      technologyCounts.set(key, {
-        label: current?.label || technology,
-        count: (current?.count || 0) + 1
-      });
-    });
-  });
-
-  chart.replaceChildren();
-  if (projects.length === 0 || technologyCounts.size === 0) {
-    summary.textContent = "Belum ada data teknologi dari repo publik.";
+  const context = canvas.getContext("2d");
+  if (!context) {
+    status.textContent = "Game tidak dapat dimuat di browser ini.";
+    startButton.disabled = true;
     return;
   }
 
-  const technologies = [...technologyCounts.values()].sort(
-    (first, second) => second.count - first.count || first.label.localeCompare(second.label)
-  );
+  const cellSize = 20;
+  const columns = canvas.width / cellSize;
+  const rows = canvas.height / cellSize;
+  const directions = {
+    up: { x: 0, y: -1 },
+    down: { x: 0, y: 1 },
+    left: { x: -1, y: 0 },
+    right: { x: 1, y: 0 }
+  };
+  let snake;
+  let direction;
+  let nextDirection;
+  let food;
+  let score = 0;
+  let best = 0;
+  let timer = null;
+  let isRunning = false;
+  let hasStarted = false;
 
-  technologies.forEach(({ label, count }) => {
-    const row = document.createElement("div");
-    row.className = "skill-chart-row";
-    row.setAttribute("role", "listitem");
+  const placeFood = () => {
+    let candidate;
+    do {
+      candidate = {
+        x: Math.floor(Math.random() * columns),
+        y: Math.floor(Math.random() * rows)
+      };
+    } while (snake.some((segment) => segment.x === candidate.x && segment.y === candidate.y));
+    return candidate;
+  };
 
-    const name = document.createElement("span");
-    name.className = "skill-chart-name";
-    name.textContent = label;
+  const draw = () => {
+    context.fillStyle = "#101b2c";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.strokeStyle = "rgba(133, 171, 199, .09)";
+    context.lineWidth = 1;
+    for (let x = 0; x <= columns; x += 1) {
+      context.beginPath();
+      context.moveTo(x * cellSize + .5, 0);
+      context.lineTo(x * cellSize + .5, canvas.height);
+      context.stroke();
+    }
+    for (let y = 0; y <= rows; y += 1) {
+      context.beginPath();
+      context.moveTo(0, y * cellSize + .5);
+      context.lineTo(canvas.width, y * cellSize + .5);
+      context.stroke();
+    }
 
-    const track = document.createElement("span");
-    track.className = "skill-chart-track";
-    track.setAttribute("aria-hidden", "true");
+    context.fillStyle = "#ffca62";
+    context.shadowColor = "#ffca62";
+    context.shadowBlur = 12;
+    context.beginPath();
+    context.arc(food.x * cellSize + cellSize / 2, food.y * cellSize + cellSize / 2, cellSize * .31, 0, Math.PI * 2);
+    context.fill();
+    context.shadowBlur = 0;
 
-    const bar = document.createElement("span");
-    bar.className = "skill-chart-bar";
-    bar.style.setProperty("--bar-width", `${(count / projects.length) * 100}%`);
-    track.append(bar);
+    snake.forEach((segment, index) => {
+      const inset = index === 0 ? 2 : 3;
+      context.fillStyle = index === 0 ? "#52e0bd" : "#31b993";
+      context.beginPath();
+      context.roundRect(
+        segment.x * cellSize + inset,
+        segment.y * cellSize + inset,
+        cellSize - inset * 2,
+        cellSize - inset * 2,
+        5
+      );
+      context.fill();
+    });
 
-    const total = document.createElement("span");
-    total.className = "skill-chart-count";
-    total.textContent = `${count} repo`;
+    const head = snake[0];
+    const eyeOffset = direction.x === 0 ? 5 : 0;
+    const eyeOffsetY = direction.y === 0 ? 5 : 0;
+    const eyeX = head.x * cellSize + cellSize / 2 + direction.x * 4 + eyeOffset;
+    const eyeY = head.y * cellSize + cellSize / 2 + direction.y * 4 + eyeOffsetY;
+    context.fillStyle = "#102034";
+    context.beginPath();
+    context.arc(eyeX - (direction.x === 0 ? 4 : 0), eyeY - (direction.y === 0 ? 4 : 0), 1.7, 0, Math.PI * 2);
+    context.arc(eyeX + (direction.x === 0 ? 4 : 0), eyeY + (direction.y === 0 ? 4 : 0), 1.7, 0, Math.PI * 2);
+    context.fill();
+  };
 
-    row.setAttribute("aria-label", `${label}: digunakan di ${count} dari ${projects.length} repo publik`);
-    row.append(name, track, total);
-    chart.append(row);
+  const reset = () => {
+    window.clearInterval(timer);
+    timer = null;
+    isRunning = false;
+    hasStarted = false;
+    score = 0;
+    direction = directions.right;
+    nextDirection = directions.right;
+    snake = [{ x: 8, y: 8 }, { x: 7, y: 8 }, { x: 6, y: 8 }];
+    food = placeFood();
+    scoreElement.textContent = "0";
+    startButton.disabled = false;
+    startButton.innerHTML = 'Mulai game <span aria-hidden="true">▶</span>';
+    pauseButton.disabled = true;
+    pauseButton.textContent = "Jeda";
+    status.textContent = "Tekan Mulai untuk bermain.";
+    draw();
+  };
+
+  const finish = () => {
+    window.clearInterval(timer);
+    timer = null;
+    isRunning = false;
+    hasStarted = false;
+    startButton.disabled = false;
+    startButton.innerHTML = 'Main lagi <span aria-hidden="true">↻</span>';
+    pauseButton.disabled = true;
+    status.textContent = `Game selesai! Skor kamu ${score}. Tekan Main lagi untuk mencoba kembali.`;
+  };
+
+  const tick = () => {
+    direction = nextDirection;
+    const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+    const eatsFood = head.x === food.x && head.y === food.y;
+    const body = eatsFood ? snake : snake.slice(0, -1);
+    if (
+      head.x < 0 || head.x >= columns || head.y < 0 || head.y >= rows
+      || body.some((segment) => segment.x === head.x && segment.y === head.y)
+    ) {
+      finish();
+      draw();
+      return;
+    }
+
+    snake.unshift(head);
+    if (eatsFood) {
+      score += 10;
+      best = Math.max(best, score);
+      scoreElement.textContent = String(score);
+      bestElement.textContent = String(best);
+      food = placeFood();
+      status.textContent = `Byte didapat! Skor ${score}.`;
+    } else {
+      snake.pop();
+    }
+    draw();
+  };
+
+  const setDirection = (name) => {
+    const requested = directions[name];
+    if (!requested || (requested.x + direction.x === 0 && requested.y + direction.y === 0)) return;
+    nextDirection = requested;
+  };
+
+  canvas.addEventListener("keydown", (event) => {
+    const keys = {
+      ArrowUp: "up", w: "up", W: "up",
+      ArrowDown: "down", s: "down", S: "down",
+      ArrowLeft: "left", a: "left", A: "left",
+      ArrowRight: "right", d: "right", D: "right"
+    };
+    const requested = keys[event.key];
+    if (!requested) return;
+    event.preventDefault();
+    setDirection(requested);
   });
 
-  summary.textContent = `Dihitung dari ${projects.length} repo publik.`;
+  document.querySelectorAll(".snake-direction").forEach((button) => {
+    button.addEventListener("click", () => {
+      setDirection(button.dataset.direction);
+      canvas.focus({ preventScroll: true });
+    });
+  });
+
+  startButton.addEventListener("click", () => {
+    if (isRunning) return;
+    if (timer === null && status.textContent.startsWith("Game selesai!")) reset();
+    isRunning = true;
+    hasStarted = true;
+    startButton.disabled = true;
+    pauseButton.disabled = false;
+    status.textContent = "Game berjalan. Arahkan cacing ke byte!";
+    timer = window.setInterval(tick, 125);
+    canvas.focus({ preventScroll: true });
+  });
+
+  pauseButton.addEventListener("click", () => {
+    if (!isRunning) {
+      if (!hasStarted) return;
+      isRunning = true;
+      timer = window.setInterval(tick, 125);
+      pauseButton.textContent = "Jeda";
+      status.textContent = "Game dilanjutkan.";
+      return;
+    }
+    isRunning = false;
+    window.clearInterval(timer);
+    timer = null;
+    pauseButton.textContent = "Lanjut";
+    status.textContent = "Game dijeda.";
+  });
+
+  resetButton.addEventListener("click", reset);
+  reset();
 }
 
 let scrollRevealObserver;
@@ -312,7 +459,6 @@ function renderProjectPage() {
       projectStatus.textContent = `Menampilkan ${firstIndex + 1}–${lastIndex} dari ${publicRepos.length} repo publik.`;
     }
   }
-  updateSkillChart();
   initScrollAnimations();
 }
 
@@ -372,7 +518,7 @@ async function fetchPublicRepos() {
   }
 }
 
-updateSkillChart();
+initSnakeGame();
 initScrollAnimations();
 initDraggableProfile();
 fetchPublicRepos();
