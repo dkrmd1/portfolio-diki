@@ -142,6 +142,8 @@ h1 span, .contact h2 span { color: var(--accent-blue); font-family: var(--serif)
 .project-card::before { position: absolute; top: 0; right: 0; left: 0; height: 4px; background: linear-gradient(90deg, var(--accent-blue), #95b9e2 65%, var(--orange)); content: ""; }
 .project-meta { font-size: 8px; }
 .project-art { display: grid; height: 180px; margin: 18px 0 20px; place-items: center; overflow: hidden; border-radius: 3px; }
+.project-art.project-image-art { display: block; width: 100%; height: auto; aspect-ratio: 1365 / 600; background: #eaf1f8; }
+.project-image-art img { display: block; width: 100%; max-width: 100%; height: 100%; object-fit: cover; }
 .art-blue { background: var(--blue-soft); }
 .art-orange { background: var(--orange-soft); }
 .art-green { background: #dce7f3; }

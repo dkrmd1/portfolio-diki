@@ -378,7 +378,8 @@ const projectHighlights = {
   "sistem-berita-acara": {
     title: "Sistem Berita Acara",
     description: "Aplikasi Laravel untuk mengelola berita acara verifikasi nasabah, dengan approval berjenjang, tanda tangan digital, notifikasi, dan ekspor PDF.",
-    technologies: ["Laravel", "PHP", "MySQL"]
+    technologies: ["Laravel", "PHP", "MySQL"],
+    image: "assets/images/berita-acara-dashboard-redacted.png"
   },
   "absen-attendly": {
     title: "Attendly",
@@ -459,12 +460,20 @@ function createProjectCard(repo, index) {
   meta.append(language, number);
 
   const art = document.createElement("div");
-  art.className = `project-art art-${["blue", "orange", "green"][index % 3]}`;
-  art.setAttribute("aria-hidden", "true");
-  const mark = document.createElement("span");
-  mark.className = "repo-art-mark";
-  mark.textContent = repo.name.slice(0, 2).toUpperCase();
-  art.append(mark);
+  if (highlight?.image) {
+    art.className = "project-art project-image-art";
+    const image = document.createElement("img");
+    image.src = highlight.image;
+    image.alt = "Tangkapan layar dashboard Sistem Berita Acara; nama pengguna dan angka dashboard disamarkan.";
+    art.append(image);
+  } else {
+    art.className = `project-art art-${["blue", "orange", "green"][index % 3]}`;
+    art.setAttribute("aria-hidden", "true");
+    const mark = document.createElement("span");
+    mark.className = "repo-art-mark";
+    mark.textContent = repo.name.slice(0, 2).toUpperCase();
+    art.append(mark);
+  }
 
   const title = document.createElement("h3");
   title.textContent = highlight?.title || repo.name;
