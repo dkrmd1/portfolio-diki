@@ -78,6 +78,18 @@ h1 span, .contact h2 span { color: var(--accent-blue); font-family: var(--serif)
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin-bottom: 37px; }
 .section-heading .eyebrow { margin-bottom: 16px; }
 .section-note { max-width: 295px; margin: 0 0 5px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.technology-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+.technology-logo { display: flex; min-height: 65px; align-items: center; gap: 11px; padding: 10px 13px; border: 1px solid var(--line); border-radius: 7px; background: var(--white); }
+.technology-logo > span { display: grid; width: 34px; height: 34px; flex: 0 0 34px; place-items: center; border-radius: 7px; font: 800 12px Oxanium, Manrope, sans-serif; }
+.technology-logo strong { font: 700 11px Oxanium, Manrope, sans-serif; }
+.technology-laravel > span { background: #fff0eb; color: #e44d30; font-size: 18px; }
+.technology-php > span { background: #eff0fa; color: #626a9d; font-size: 10px; }
+.technology-html > span { background: #fff0e8; color: #e76535; }
+.technology-bootstrap > span { background: #f0ebfb; color: #7251a3; font-size: 18px; }
+.technology-css > span { background: #eaf3ff; color: #2874bd; font-size: 18px; }
+.technology-js > span { background: #fff6d8; color: #735c14; font-size: 10px; }
+.technology-mysql > span { background: #e9f4f8; color: #28647d; font-size: 9px; }
+.technology-flutter > span { background: #e8f5fb; color: #2386b9; font-size: 18px; }
 .skill-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .skill-card { position: relative; min-height: 238px; padding: 24px; border: 1px solid var(--line); border-radius: 9px; background: var(--white); transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
 .skill-card:hover { transform: translateY(-4px); border-color: #b7cde0; box-shadow: 0 5px 0 #dce6ef, 0 13px 22px rgba(27, 43, 66, .09); }
@@ -89,6 +101,18 @@ h1 span, .contact h2 span { color: var(--accent-blue); font-family: var(--serif)
 .skill-card p { min-height: 40px; margin-bottom: 17px; color: var(--muted); font-size: 11px; line-height: 1.7; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .tags span { padding: 6px 8px; background: rgba(255,255,255,.55); font-size: 9px; }
+.skill-chart-panel { margin-top: 18px; padding: 22px 24px; border: 1px solid #d5e0eb; border-radius: 9px; background: var(--white); }
+.skill-chart-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 17px; }
+.skill-chart-heading .eyebrow { margin-bottom: 6px; }
+.skill-chart-heading h3 { margin: 0; font: 700 17px Oxanium, Manrope, sans-serif; }
+.skill-chart-summary { margin: 0; color: var(--muted); font: 9px "DM Mono", monospace; text-align: right; }
+.skill-chart { display: grid; gap: 10px; }
+.skill-chart-row { display: grid; grid-template-columns: minmax(90px, 150px) minmax(0, 1fr) 24px; align-items: center; gap: 12px; }
+.skill-chart-label { overflow: hidden; color: #52647a; font: 10px "DM Mono", monospace; text-overflow: ellipsis; white-space: nowrap; }
+.skill-chart-track { height: 9px; overflow: hidden; border-radius: 10px; background: #edf2f7; }
+.skill-chart-bar { display: block; height: 100%; min-width: 8px; border-radius: inherit; background: linear-gradient(90deg, #2867a7, #5cb9a2); transition: width .45s ease; }
+.skill-chart-value { color: #62788e; font: 10px "DM Mono", monospace; text-align: right; }
+.skill-chart-empty { margin: 0; color: var(--muted); font-size: 11px; }
 .skill-footnote, .project-note { margin: 15px 0 0; color: #7a827a; font-size: 10px; line-height: 1.7; }
 .snake-game-panel { margin-top: 20px; padding: 26px; border: 1px solid #b9cddd; border-radius: 12px; background: linear-gradient(145deg, #fffefa, #f3f8ff); box-shadow: 0 6px 0 #d9e5ef, 0 18px 34px rgba(45, 71, 99, .1); }
 .snake-game-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
@@ -201,6 +225,12 @@ h1 span, .contact h2 span { font-family: Oxanium, Manrope, sans-serif; font-styl
 .card-drag-hint { color: var(--accent-blue); font: 8px "DM Mono", monospace; letter-spacing: .5px; }
 .project-meta span:last-child { padding: 4px 7px; border: 1px solid #d5e2ef; border-radius: 4px; background: #edf4fb; color: var(--accent-blue); font-family: Oxanium, Manrope, sans-serif; font-size: 8px; font-weight: 700; }
 .project-meta span:first-child { align-self: center; color: #78889a; }
+.private-project-card { border-style: dashed; background: linear-gradient(155deg, #fffefa, #f3f5f8 76%); }
+.private-project-card .project-meta span:last-child { border-color: #e7d8bd; background: #fff7e9; color: #926b35; }
+.private-project-card .repo-art-mark { border-radius: 9px; color: #8f744c; }
+.contact-actions .whatsapp-button { border-color: #1c8b62; background: #1c8b62; }
+.contact-actions .whatsapp-button:hover { background: #14734f; }
+.contact-row .whatsapp-number { margin: 10px 0 0; color: #718078; font: 10px "DM Mono", monospace; }
 .page-button { border-radius: 6px; box-shadow: 0 3px 0 #dce6ef; }
 .page-button:active:not(:disabled) { transform: translateY(2px); box-shadow: none; }
 @keyframes status-pulse { 50% { box-shadow: 0 0 0 7px rgba(242, 138, 69, .04); } }
@@ -215,6 +245,7 @@ h1 span, .contact h2 span { font-family: Oxanium, Manrope, sans-serif; font-styl
   .about-grid { grid-template-columns: 1fr; gap: 22px; }
   .about-copy { padding-top: 0; }
   .skill-grid, .project-grid { grid-template-columns: 1fr 1fr; }
+  .technology-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .snake-game-layout { grid-template-columns: minmax(0, 1.35fr) minmax(175px, .75fr); gap: 14px; }
   .snake-game-panel { padding: 20px; }
   .snake-game-sidebar { padding: 12px; }
@@ -243,6 +274,13 @@ h1 span, .contact h2 span { font-family: Oxanium, Manrope, sans-serif; font-styl
   .section { padding-block: 72px; }
   .about h2, .section-heading h2 { font-size: 34px; letter-spacing: -1.5px; }
   .skill-grid, .project-grid { grid-template-columns: 1fr; }
+  .technology-strip { gap: 8px; }
+  .technology-logo { min-height: 58px; padding: 8px; }
+  .technology-logo > span { width: 30px; height: 30px; flex-basis: 30px; }
+  .skill-chart-panel { padding: 18px 14px; }
+  .skill-chart-heading { align-items: start; flex-direction: column; gap: 7px; }
+  .skill-chart-summary { text-align: left; }
+  .skill-chart-row { grid-template-columns: minmax(75px, 100px) minmax(0, 1fr) 20px; gap: 8px; }
   .snake-game-panel { padding: 17px 13px; }
   .snake-game-heading { align-items: start; flex-direction: column; gap: 14px; }
   .snake-game-layout { grid-template-columns: 1fr; }

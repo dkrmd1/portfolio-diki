@@ -364,9 +364,15 @@ const starCount = document.getElementById("starCount");
 const previousProjects = document.getElementById("previousProjects");
 const nextProjects = document.getElementById("nextProjects");
 const projectPageIndicator = document.getElementById("projectPageIndicator");
+const skillChart = document.getElementById("skillChart");
+const skillChartSummary = document.getElementById("skillChartSummary");
 const projectsPerPage = 3;
 let publicRepos = [];
 let currentProjectPage = 0;
+const privateRepos = ["notarisapp", "nexus-rabbit", "rental-mobil"].map((name) => ({
+  name,
+  private: true
+}));
 
 const projectHighlights = {
   "sistem-berita-acara": {
@@ -392,15 +398,62 @@ function getRepositoryTechnologies(repo) {
   return repo.language ? [repo.language] : [];
 }
 
+function renderSkillChart() {
+  if (!skillChart) return;
+
+  const technologyCounts = new Map();
+  publicRepos.forEach((repo) => {
+    new Set(getRepositoryTechnologies(repo)).forEach((technology) => {
+      technologyCounts.set(technology, (technologyCounts.get(technology) || 0) + 1);
+    });
+  });
+
+  const topTechnologies = [...technologyCounts.entries()]
+    .sort((first, second) => second[1] - first[1] || first[0].localeCompare(second[0]))
+    .slice(0, 6);
+  if (skillChartSummary) {
+    skillChartSummary.textContent = `${publicRepos.length} repo publik · repo private tidak dihitung`;
+  }
+  if (topTechnologies.length === 0) {
+    skillChart.replaceChildren();
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "skill-chart-empty";
+    emptyMessage.textContent = "Grafik akan tampil saat data repo publik tersedia.";
+    skillChart.append(emptyMessage);
+    return;
+  }
+
+  const maximum = topTechnologies[0][1];
+  skillChart.replaceChildren(...topTechnologies.map(([technology, count]) => {
+    const row = document.createElement("div");
+    row.className = "skill-chart-row";
+    row.setAttribute("role", "listitem");
+    const label = document.createElement("span");
+    label.className = "skill-chart-label";
+    label.textContent = technology;
+    const track = document.createElement("span");
+    track.className = "skill-chart-track";
+    const bar = document.createElement("span");
+    bar.className = "skill-chart-bar";
+    bar.style.width = `${Math.max(12, (count / maximum) * 100)}%`;
+    track.append(bar);
+    const value = document.createElement("span");
+    value.className = "skill-chart-value";
+    value.textContent = String(count);
+    row.append(label, track, value);
+    return row;
+  }));
+}
+
 function createProjectCard(repo, index) {
   const highlight = projectHighlights[repo.name];
   const card = document.createElement("article");
-  card.className = "project-card";
+  card.className = repo.private ? "project-card private-project-card" : "project-card";
 
   const meta = document.createElement("div");
   meta.className = "project-meta";
   const language = document.createElement("span");
-  language.textContent = repo.language || "REPOSITORI PUBLIK";
+  language.textContent = repo.private ? "REPO PRIVATE" : repo.language || "REPOSITORI PUBLIK";
   const number = document.createElement("span");
   number.textContent = `${String(index + 1).padStart(2, "0")} / ${String(repo.totalCount).padStart(2, "0")}`;
   meta.append(language, number);
@@ -416,15 +469,17 @@ function createProjectCard(repo, index) {
   const title = document.createElement("h3");
   title.textContent = highlight?.title || repo.name;
   const description = document.createElement("p");
-  description.textContent = highlight?.description
-    || repo.description
-    || `Repositori publik${repo.language ? ` dengan bahasa utama ${repo.language}` : ""}.`;
+  description.textContent = repo.private
+    ? "Repositori private. Hanya nama yang ditampilkan; detail dan kode tidak dibagikan."
+    : highlight?.description
+      || repo.description
+      || `Repositori publik${repo.language ? ` dengan bahasa utama ${repo.language}` : ""}.`;
 
   const footer = document.createElement("div");
   footer.className = "project-footer";
   const tags = document.createElement("div");
   tags.className = "tags";
-  (highlight?.technologies || (repo.language ? [repo.language] : [])).forEach((technology) => {
+  (repo.private ? [] : highlight?.technologies || (repo.language ? [repo.language] : [])).forEach((technology) => {
     const tag = document.createElement("span");
     tag.textContent = technology;
     tags.append(tag);
@@ -437,13 +492,14 @@ function createProjectCard(repo, index) {
 function renderProjectPage() {
   if (!projectGrid) return;
 
-  const pageCount = Math.max(1, Math.ceil(publicRepos.length / projectsPerPage));
+  const allRepos = [...publicRepos, ...privateRepos];
+  const pageCount = Math.max(1, Math.ceil(allRepos.length / projectsPerPage));
   currentProjectPage = Math.min(currentProjectPage, pageCount - 1);
   const firstIndex = currentProjectPage * projectsPerPage;
-  const visibleRepos = publicRepos.slice(firstIndex, firstIndex + projectsPerPage);
+  const visibleRepos = allRepos.slice(firstIndex, firstIndex + projectsPerPage);
 
   projectGrid.replaceChildren(...visibleRepos.map((repo, index) => createProjectCard(
-    { ...repo, totalCount: publicRepos.length },
+    { ...repo, totalCount: allRepos.length },
     firstIndex + index
   )));
   if (previousProjects) previousProjects.disabled = currentProjectPage === 0;
@@ -452,13 +508,14 @@ function renderProjectPage() {
     projectPageIndicator.textContent = `Halaman ${currentProjectPage + 1} / ${pageCount}`;
   }
   if (projectStatus) {
-    if (publicRepos.length === 0) {
-      projectStatus.textContent = "Belum ada repositori publik.";
+    if (allRepos.length === 0) {
+      projectStatus.textContent = "Belum ada repositori untuk ditampilkan.";
     } else {
-      const lastIndex = Math.min(firstIndex + visibleRepos.length, publicRepos.length);
-      projectStatus.textContent = `Menampilkan ${firstIndex + 1}–${lastIndex} dari ${publicRepos.length} repo publik.`;
+      const lastIndex = Math.min(firstIndex + visibleRepos.length, allRepos.length);
+      projectStatus.textContent = `Menampilkan ${firstIndex + 1}–${lastIndex} dari ${allRepos.length} repo (${publicRepos.length} publik, ${privateRepos.length} private).`;
     }
   }
+  renderSkillChart();
   initScrollAnimations();
 }
 
@@ -472,7 +529,7 @@ if (previousProjects) {
 
 if (nextProjects) {
   nextProjects.addEventListener("click", () => {
-    if (currentProjectPage >= Math.ceil(publicRepos.length / projectsPerPage) - 1) return;
+    if (currentProjectPage >= Math.ceil((publicRepos.length + privateRepos.length) / projectsPerPage) - 1) return;
     currentProjectPage += 1;
     renderProjectPage();
   });
@@ -506,14 +563,14 @@ async function fetchPublicRepos() {
     }
     if (githubStatus) githubStatus.textContent = "Statistik hanya dari repositori publik.";
     if (projectNote) {
-      projectNote.textContent = "Daftar diperbarui otomatis saat halaman dibuka. Hanya repositori publik yang dimuat; repositori private tidak diakses atau ditampilkan.";
+      projectNote.textContent = "Repo publik diperbarui otomatis. Untuk repo private, hanya nama yang ditampilkan sesuai permintaan; deskripsi, kode, dan tautan tidak disertakan.";
     }
   } catch (error) {
     console.error("Tidak dapat memuat repositori publik:", error);
     if (githubStatus) githubStatus.textContent = "Statistik repo publik belum tersedia.";
-    if (projectStatus) projectStatus.textContent = "Daftar repo publik belum dapat diperbarui.";
+    renderProjectPage();
     if (projectNote) {
-      projectNote.textContent = "Daftar otomatis tidak tersedia saat ini. Kartu proyek yang tampil adalah pilihan publik yang tersimpan di halaman.";
+      projectNote.textContent = "Daftar repo publik belum dapat diperbarui. Nama repo private yang telah ditambahkan tetap ditampilkan.";
     }
   }
 }

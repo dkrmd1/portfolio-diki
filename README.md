@@ -5,12 +5,16 @@ Website statis responsif untuk GitHub Pages. Tidak memerlukan framework atau pro
 ## Isi
 
 - Ringkasan profil dan teknologi
+- Logo teknologi Laravel, PHP, HTML, Bootstrap, CSS, JavaScript, MySQL, dan Flutter
+- Grafik teknologi yang dihitung hanya dari repositori publik
 - Game cacing yang dimainkan langsung di halaman dengan keyboard atau kontrol sentuh
 - Daftar repositori publik yang diperbarui dari GitHub API saat halaman dibuka
+- Nama repositori private pilihan ditampilkan manual tanpa deskripsi, bahasa, tautan, atau isi kode
 - Navigasi proyek per halaman dengan tombol sebelumnya dan berikutnya
 - Font game pada judul dan navigasi, kartu proyek bergaya kartu game, serta profil yang bisa digeser dengan mouse/sentuhan
 - Statistik jumlah repositori dan stars publik
-- Repo private tidak dimuat, ditampilkan, atau ditautkan; kartu proyek tidak memiliki tautan keluar
+- Kartu proyek tidak memiliki tautan keluar
+- Tombol kontak langsung ke WhatsApp
 - Animasi saat menggulir, navigasi responsif, dan dukungan reduced motion
 
 ## Menjalankan lokal
@@ -21,7 +25,7 @@ Buka `index.html` di browser. Untuk memeriksa pemuatan statistik GitHub, gunakan
 
 Salin isi folder ini ke repositori GitHub Pages Anda, misalnya `dkrmd.github.io`, lalu aktifkan Pages dari branch dan folder yang digunakan repositori tersebut.
 
-Statistik dan daftar proyek bersumber dari GitHub API publik dan dapat tidak tampil sementara jika API mengalami gangguan atau pembatasan permintaan. Halaman hanya memuat repositori publik dan tidak menautkan kartu proyek ke GitHub.
+Statistik, grafik keahlian, dan daftar repo publik bersumber dari GitHub API dan dapat tidak tampil sementara jika API mengalami gangguan atau pembatasan permintaan. Nama repo private di `script.js` dikelola manual; nama-nama tersebut menjadi informasi publik di website. Jangan tambahkan deskripsi, URL, token, atau informasi sensitif. Kartu proyek tidak menautkan pengunjung ke GitHub.
 
 ## Profil GitHub
 
