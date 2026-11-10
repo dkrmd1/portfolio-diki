@@ -10,6 +10,7 @@ Website statis responsif untuk GitHub Pages. Tidak memerlukan framework atau pro
 - Game cacing yang dimainkan langsung di halaman dengan keyboard atau kontrol sentuh
 - Daftar repositori publik yang diperbarui dari GitHub API saat halaman dibuka
 - Screenshot dashboard Sistem Berita Acara pada kartu proyek, dengan nama pengguna dan angka dashboard disamarkan
+- Screenshot dashboard Log Activity pada kartu proyek dengan angka statistik disamarkan
 - Nama repositori private pilihan ditampilkan manual tanpa deskripsi, bahasa, tautan, atau isi kode
 - Navigasi proyek per halaman dengan tombol sebelumnya dan berikutnya
 - Font game pada judul dan navigasi, kartu proyek bergaya kartu game, serta profil yang bisa digeser dengan mouse/sentuhan

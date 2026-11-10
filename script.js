@@ -379,7 +379,8 @@ const projectHighlights = {
     title: "Sistem Berita Acara",
     description: "Aplikasi Laravel untuk mengelola berita acara verifikasi nasabah, dengan approval berjenjang, tanda tangan digital, notifikasi, dan ekspor PDF.",
     technologies: ["Laravel", "PHP", "MySQL"],
-    image: "assets/images/berita-acara-dashboard-redacted.png"
+    image: "assets/images/berita-acara-dashboard-redacted.png",
+    imageAlt: "Tangkapan layar dashboard Sistem Berita Acara; nama pengguna dan angka dashboard disamarkan."
   },
   "absen-attendly": {
     title: "Attendly",
@@ -389,7 +390,9 @@ const projectHighlights = {
   "log-activity": {
     title: "Log Activity",
     description: "Aplikasi Laravel dengan laporan bulanan dan pembuatan PDF, termasuk format cover serta nomor halaman.",
-    technologies: ["Laravel", "PHP"]
+    technologies: ["Laravel", "PHP"],
+    image: "assets/images/log-activity-dashboard.png",
+    imageAlt: "Tangkapan layar dashboard Log Activity dengan angka statistik disamarkan."
   }
 };
 
@@ -464,7 +467,7 @@ function createProjectCard(repo, index) {
     art.className = "project-art project-image-art";
     const image = document.createElement("img");
     image.src = highlight.image;
-    image.alt = "Tangkapan layar dashboard Sistem Berita Acara; nama pengguna dan angka dashboard disamarkan.";
+    image.alt = highlight.imageAlt;
     art.append(image);
   } else {
     art.className = `project-art art-${["blue", "orange", "green"][index % 3]}`;
