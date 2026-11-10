@@ -65,7 +65,7 @@ h1 span, .contact h2 span { color: var(--accent-blue); font-family: var(--serif)
 .stats strong { font: 700 24px Manrope, sans-serif; }
 .stats span, .stats-note { color: var(--muted); font-size: 10px; }
 .stats-note { min-height: 15px; margin: 12px 0; }
-.card-link, .text-link { display: inline-flex; align-items: center; gap: 9px; color: var(--accent-blue); font-size: 12px; font-weight: 700; }
+.text-link { display: inline-flex; align-items: center; gap: 9px; color: var(--accent-blue); font-size: 12px; font-weight: 700; }
 .hero-index { position: absolute; right: 0; bottom: 30px; color: #9da39a; font: 9px "DM Mono", monospace; letter-spacing: 1px; }
 .section { padding-block: 100px; }
 .about { background: #e8f0fa; }
@@ -101,7 +101,6 @@ h1 span, .contact h2 span { color: var(--accent-blue); font-family: var(--serif)
 .skill-chart-bar { display: block; width: var(--bar-width, 0%); height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent-blue), #78a5d2); transition: width .75s cubic-bezier(.2, .75, .25, 1); }
 .skill-chart-count { color: var(--muted); font-size: 10px; text-align: right; white-space: nowrap; }
 .projects { background: #edf1f6; }
-.all-projects { margin-bottom: 6px; white-space: nowrap; }
 .project-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .project-card { min-width: 0; padding: 19px; border: 1px solid #e0dfd7; border-radius: 5px; background: var(--white); }
 .project-meta { font-size: 8px; }
@@ -109,6 +108,7 @@ h1 span, .contact h2 span { color: var(--accent-blue); font-family: var(--serif)
 .art-blue { background: var(--blue-soft); }
 .art-orange { background: var(--orange-soft); }
 .art-green { background: #dce7f3; }
+.repo-art-mark { display: grid; width: 108px; height: 108px; place-items: center; border: 1px solid rgba(40, 103, 167, .12); border-radius: 50%; background: rgba(255, 254, 250, .88); box-shadow: 0 12px 26px rgba(51, 74, 106, .12); color: var(--accent-blue); font: 800 24px Manrope, sans-serif; letter-spacing: -1px; transform: rotate(-7deg); }
 .art-window { position: relative; display: block; width: 72%; height: 118px; padding: 14px; border-radius: 6px; background: rgba(255,255,255,.9); box-shadow: 0 10px 24px rgba(51, 74, 106, .12); transform: rotate(-4deg); }
 .art-window i { display: inline-block; width: 5px; height: 5px; margin-right: 3px; border-radius: 50%; background: #90abd0; }
 .art-window b { display: block; margin-top: 20px; color: #435b80; font: 700 16px/1.1 Manrope, sans-serif; }
@@ -126,6 +126,7 @@ h1 span, .contact h2 span { color: var(--accent-blue); font-family: var(--serif)
 .report em { margin-top: 5px; color: var(--orange); font: 700 8px "DM Mono", monospace; font-style: normal; }
 .project-card h3 { margin-bottom: 9px; font: 700 17px Manrope, sans-serif; }
 .project-card > p { min-height: 78px; margin-bottom: 17px; color: #6d756e; font-size: 11px; line-height: 1.8; }
+.project-status { margin: 0 0 5px; color: var(--muted); font-size: 11px; line-height: 1.6; }
 .project-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 13px; border-top: 1px solid #e8e7df; }
 .project-footer .tags { gap: 4px; }
 .project-footer .tags span { padding: 5px 6px; font-size: 8px; }
@@ -165,8 +166,6 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--accent-blue); o
   .about-copy { padding-top: 0; }
   .skill-grid, .project-grid { grid-template-columns: 1fr 1fr; }
   .skill-chart { grid-template-columns: 1fr; }
-  .project-card:last-child { grid-column: span 2; }
-  .project-card:last-child .project-art { height: 160px; }
   .section-heading { align-items: start; flex-direction: column; gap: 14px; }
   .section-note { max-width: 460px; }
   .contact-row { align-items: start; flex-direction: column; }
@@ -193,11 +192,9 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--accent-blue); o
   .skill-chart-heading { align-items: start; flex-direction: column; gap: 8px; }
   .skill-chart-summary { text-align: left; }
   .skill-chart-row { grid-template-columns: 76px minmax(25px, 1fr) 60px; gap: 8px; }
-  .project-card:last-child { grid-column: auto; }
   .skill-card { min-height: 220px; }
-  .project-art, .project-card:last-child .project-art { height: 185px; }
+  .project-art { height: 185px; }
   .project-card > p { min-height: auto; }
-  .all-projects { margin-top: 2px; }
   .contact h2 { font-size: 47px; letter-spacing: -2px; }
   .footer-row { align-items: flex-start; flex-direction: column; gap: 11px; }
 }

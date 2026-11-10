@@ -6,8 +6,9 @@ Website statis responsif untuk GitHub Pages. Tidak memerlukan framework atau pro
 
 - Ringkasan profil dan teknologi
 - Grafik jumlah proyek untuk tiap teknologi, diperbarui otomatis dari tag proyek
-- Proyek pilihan yang ditautkan ke repositori GitHub publik
-- Statistik jumlah repositori dan stars yang dimuat dari GitHub API
+- Daftar repositori publik yang diperbarui dari GitHub API saat halaman dibuka
+- Statistik jumlah repositori dan stars publik
+- Repo private tidak dimuat, ditampilkan, atau ditautkan; kartu proyek tidak memiliki tautan keluar
 - Animasi saat menggulir, navigasi responsif, dan dukungan reduced motion
 
 ## Menjalankan lokal

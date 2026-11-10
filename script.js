@@ -48,7 +48,7 @@ function updateSkillChart() {
 
   chart.replaceChildren();
   if (projects.length === 0 || technologyCounts.size === 0) {
-    summary.textContent = "Belum ada data teknologi dari proyek pilihan.";
+    summary.textContent = "Belum ada data teknologi dari repo publik.";
     return;
   }
 
@@ -76,66 +76,161 @@ function updateSkillChart() {
 
     const total = document.createElement("span");
     total.className = "skill-chart-count";
-    total.textContent = `${count} proyek`;
+    total.textContent = `${count} repo`;
 
-    row.setAttribute("aria-label", `${label}: digunakan di ${count} dari ${projects.length} proyek`);
+    row.setAttribute("aria-label", `${label}: digunakan di ${count} dari ${projects.length} repo publik`);
     row.append(name, track, total);
     chart.append(row);
   });
 
-  summary.textContent = `Dihitung dari ${projects.length} proyek pilihan.`;
+  summary.textContent = `Dihitung dari ${projects.length} repo publik.`;
 }
 
+let scrollRevealObserver;
+
 function initScrollAnimations() {
-  const targets = document.querySelectorAll(
-    ".hero-copy, .hero-card, .about-grid > div, .skill-card, .skill-chart-panel, .project-card, .contact-row > *"
-  );
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reducedMotion || !("IntersectionObserver" in window)) return;
 
-  const observer = new IntersectionObserver((entries, currentObserver) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add("is-visible");
-      currentObserver.unobserve(entry.target);
-    });
-  }, { threshold: 0.12, rootMargin: "0px 0px -36px 0px" });
+  if (!scrollRevealObserver) {
+    scrollRevealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -36px 0px" });
+  }
 
-  targets.forEach((target) => {
+  document.querySelectorAll(
+    ".hero-copy, .hero-card, .about-grid > div, .skill-card, .skill-chart-panel, .project-card, .contact-row > *"
+  ).forEach((target) => {
+    if (target.classList.contains("reveal-on-scroll")) return;
     target.classList.add("reveal-on-scroll");
-    observer.observe(target);
+    scrollRevealObserver.observe(target);
   });
+}
+
+const projectGrid = document.querySelector(".project-grid");
+const projectStatus = document.getElementById("projectStatus");
+const projectNote = document.querySelector(".project-note");
+const githubStatus = document.getElementById("githubStatus");
+const repoCount = document.getElementById("repoCount");
+const starCount = document.getElementById("starCount");
+
+const projectHighlights = {
+  "sistem-berita-acara": {
+    title: "Sistem Berita Acara",
+    description: "Aplikasi Laravel untuk mengelola berita acara verifikasi nasabah, dengan approval berjenjang, tanda tangan digital, notifikasi, dan ekspor PDF.",
+    technologies: ["Laravel", "PHP", "MySQL"]
+  },
+  "absen-attendly": {
+    title: "Attendly",
+    description: "Prototipe absensi dengan aplikasi Flutter dan API Laravel untuk login, check-in/out, riwayat, dan pengajuan.",
+    technologies: ["Laravel", "Flutter"]
+  },
+  "log-activity": {
+    title: "Log Activity",
+    description: "Aplikasi Laravel dengan laporan bulanan dan pembuatan PDF, termasuk format cover serta nomor halaman.",
+    technologies: ["Laravel", "PHP"]
+  }
+};
+
+function createProjectCard(repo, index) {
+  const highlight = projectHighlights[repo.name];
+  const card = document.createElement("article");
+  card.className = "project-card";
+
+  const meta = document.createElement("div");
+  meta.className = "project-meta";
+  const language = document.createElement("span");
+  language.textContent = repo.language || "REPOSITORI PUBLIK";
+  const number = document.createElement("span");
+  number.textContent = `${String(index + 1).padStart(2, "0")} / ${String(repo.totalCount).padStart(2, "0")}`;
+  meta.append(language, number);
+
+  const art = document.createElement("div");
+  art.className = `project-art art-${["blue", "orange", "green"][index % 3]}`;
+  art.setAttribute("aria-hidden", "true");
+  const mark = document.createElement("span");
+  mark.className = "repo-art-mark";
+  mark.textContent = repo.name.slice(0, 2).toUpperCase();
+  art.append(mark);
+
+  const title = document.createElement("h3");
+  title.textContent = highlight?.title || repo.name;
+  const description = document.createElement("p");
+  description.textContent = highlight?.description
+    || repo.description
+    || `Repositori publik${repo.language ? ` dengan bahasa utama ${repo.language}` : ""}.`;
+
+  const footer = document.createElement("div");
+  footer.className = "project-footer";
+  const tags = document.createElement("div");
+  tags.className = "tags";
+  (highlight?.technologies || (repo.language ? [repo.language] : [])).forEach((technology) => {
+    const tag = document.createElement("span");
+    tag.textContent = technology;
+    tags.append(tag);
+  });
+  footer.append(tags);
+  card.append(meta, art, title, description, footer);
+  return card;
+}
+
+async function fetchPublicRepos() {
+  const repos = [];
+  let page = 1;
+  try {
+    while (true) {
+      const response = await fetch(
+        `https://api.github.com/users/dkrmd1/repos?type=owner&sort=updated&per_page=100&page=${page}`,
+        { cache: "no-store" }
+      );
+      if (!response.ok) throw new Error(`GitHub API returned ${response.status}`);
+
+      const pageRepos = await response.json();
+      if (!Array.isArray(pageRepos)) throw new Error("GitHub API returned an unexpected response");
+      repos.push(...pageRepos);
+      if (pageRepos.length < 100) break;
+      page += 1;
+    }
+
+    const publicRepos = repos.filter((repo) => repo && repo.private === false);
+    publicRepos.sort((first, second) => new Date(second.updated_at) - new Date(first.updated_at));
+    if (projectGrid) {
+      projectGrid.replaceChildren(...publicRepos.map((repo, index) => createProjectCard(
+        { ...repo, totalCount: publicRepos.length },
+        index
+      )));
+      initScrollAnimations();
+    }
+
+    if (repoCount) repoCount.textContent = String(publicRepos.length);
+    if (starCount) {
+      starCount.textContent = String(publicRepos.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0));
+    }
+    if (githubStatus) githubStatus.textContent = "Statistik hanya dari repositori publik.";
+    if (projectStatus) {
+      projectStatus.textContent = `${publicRepos.length} repositori publik ditampilkan.`;
+    }
+    if (projectNote) {
+      projectNote.textContent = "Daftar diperbarui otomatis saat halaman dibuka. Hanya repositori publik yang dimuat; repositori private tidak diakses atau ditampilkan.";
+    }
+  } catch (error) {
+    console.error("Tidak dapat memuat repositori publik:", error);
+    if (githubStatus) githubStatus.textContent = "Statistik repo publik belum tersedia.";
+    if (projectStatus) projectStatus.textContent = "Daftar repo publik belum dapat diperbarui.";
+    if (projectNote) {
+      projectNote.textContent = "Daftar otomatis tidak tersedia saat ini. Kartu proyek yang tampil adalah pilihan publik yang tersimpan di halaman.";
+    }
+  }
 }
 
 updateSkillChart();
 initScrollAnimations();
-
-const projectGrid = document.querySelector(".project-grid");
 if (projectGrid) {
   const projectObserver = new MutationObserver(updateSkillChart);
   projectObserver.observe(projectGrid, { childList: true, subtree: true, characterData: true });
 }
-
-async function loadGitHubStats() {
-  const status = document.getElementById("githubStatus");
-  const repoCount = document.getElementById("repoCount");
-  const starCount = document.getElementById("starCount");
-
-  try {
-    const response = await fetch("https://api.github.com/users/dkrmd1/repos?type=owner&sort=updated&per_page=100");
-    if (!response.ok) throw new Error(`GitHub API returned ${response.status}`);
-
-    const repos = await response.json();
-    if (!Array.isArray(repos)) throw new Error("GitHub API returned an unexpected response");
-
-    const originals = repos.filter((repo) => !repo.fork);
-    repoCount.textContent = String(originals.length);
-    starCount.textContent = String(originals.reduce((sum, repo) => sum + repo.stargazers_count, 0));
-    status.textContent = "Statistik dari repositori publik GitHub.";
-  } catch (error) {
-    console.error("Tidak dapat memuat statistik GitHub:", error);
-    status.textContent = "Statistik belum tersedia. Kunjungi GitHub untuk melihat repositori terbaru.";
-  }
-}
-
-loadGitHubStats();
+fetchPublicRepos();
