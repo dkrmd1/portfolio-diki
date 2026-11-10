@@ -8,7 +8,7 @@ Website statis responsif untuk GitHub Pages. Tidak memerlukan framework atau pro
 - Grafik jumlah proyek untuk tiap teknologi, diperbarui otomatis dari tag proyek
 - Daftar repositori publik yang diperbarui dari GitHub API saat halaman dibuka
 - Navigasi proyek per halaman dengan tombol sebelumnya dan berikutnya
-- Tema robot futuristis dengan ilustrasi robot dan cuplikan kode
+- Font game pada judul dan navigasi, kartu proyek bergaya kartu game, serta profil yang bisa digeser dengan mouse/sentuhan
 - Statistik jumlah repositori dan stars publik
 - Repo private tidak dimuat, ditampilkan, atau ditautkan; kartu proyek tidak memiliki tautan keluar
 - Animasi saat menggulir, navigasi responsif, dan dukungan reduced motion
@@ -21,7 +21,7 @@ Buka `index.html` di browser. Untuk memeriksa pemuatan statistik GitHub, gunakan
 
 Salin isi folder ini ke repositori GitHub Pages Anda, misalnya `dkrmd.github.io`, lalu aktifkan Pages dari branch dan folder yang digunakan repositori tersebut.
 
-Statistik bersumber dari GitHub API publik dan dapat tidak tampil sementara jika API mengalami gangguan atau pembatasan permintaan. Informasi proyek pada halaman ini dirangkum dari README repositori publik yang ditautkan.
+Statistik dan daftar proyek bersumber dari GitHub API publik dan dapat tidak tampil sementara jika API mengalami gangguan atau pembatasan permintaan. Halaman hanya memuat repositori publik dan tidak menautkan kartu proyek ke GitHub.
 
 ## Profil GitHub
 

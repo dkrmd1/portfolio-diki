@@ -113,6 +113,101 @@ function initScrollAnimations() {
   });
 }
 
+function initDraggableProfile() {
+  const card = document.querySelector(".hero-card");
+  const hero = document.querySelector(".hero");
+  if (!card || !hero) return;
+
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let offsetStartX = 0;
+  let offsetStartY = 0;
+  let offsetX = 0;
+  let offsetY = 0;
+  let isDragging = false;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const applyPosition = (tiltX = 0, tiltY = 0) => {
+    card.style.setProperty("--profile-x", `${offsetX}px`);
+    card.style.setProperty("--profile-y", `${offsetY}px`);
+    card.style.setProperty("--profile-rotate-x", `${tiltX}deg`);
+    card.style.setProperty("--profile-rotate-y", `${tiltY}deg`);
+  };
+
+  const moveBy = (x, y) => {
+    const heroRect = hero.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const baseLeft = cardRect.left - offsetX;
+    const baseTop = cardRect.top - offsetY;
+    const minX = heroRect.left + 8 - baseLeft;
+    const maxX = heroRect.right - cardRect.width - 8 - baseLeft;
+    const minY = heroRect.top + 8 - baseTop;
+    const maxY = heroRect.bottom - cardRect.height - 8 - baseTop;
+    offsetX = Math.min(maxX, Math.max(minX, x));
+    offsetY = Math.min(maxY, Math.max(minY, y));
+    applyPosition();
+  };
+
+  card.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || event.target.closest("a, button")) return;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    offsetStartX = offsetX;
+    offsetStartY = offsetY;
+    isDragging = true;
+    card.classList.add("is-dragging");
+    card.setPointerCapture(event.pointerId);
+  });
+
+  card.addEventListener("pointermove", (event) => {
+    if (!isDragging) {
+      if (reduceMotion || event.pointerType === "touch") return;
+      const bounds = card.getBoundingClientRect();
+      const tiltY = ((event.clientX - bounds.left) / bounds.width - 0.5) * 7;
+      const tiltX = (0.5 - (event.clientY - bounds.top) / bounds.height) * 7;
+      applyPosition(tiltX, tiltY);
+      return;
+    }
+
+    moveBy(
+      offsetStartX + event.clientX - pointerStartX,
+      offsetStartY + event.clientY - pointerStartY
+    );
+  });
+
+  const finishDrag = (event) => {
+    if (!isDragging) return;
+    isDragging = false;
+    card.classList.remove("is-dragging");
+    if (card.hasPointerCapture(event.pointerId)) card.releasePointerCapture(event.pointerId);
+    applyPosition();
+  };
+
+  card.addEventListener("pointerup", finishDrag);
+  card.addEventListener("pointercancel", finishDrag);
+  card.addEventListener("pointerleave", () => {
+    if (!isDragging) applyPosition();
+  });
+  card.addEventListener("keydown", (event) => {
+    const directions = {
+      ArrowLeft: [-12, 0],
+      ArrowRight: [12, 0],
+      ArrowUp: [0, -12],
+      ArrowDown: [0, 12]
+    };
+    const direction = directions[event.key];
+    if (!direction) return;
+    event.preventDefault();
+    moveBy(offsetX + direction[0], offsetY + direction[1]);
+  });
+
+  window.addEventListener("resize", () => {
+    offsetX = 0;
+    offsetY = 0;
+    applyPosition();
+  });
+}
+
 const projectGrid = document.querySelector(".project-grid");
 const projectStatus = document.getElementById("projectStatus");
 const projectNote = document.querySelector(".project-note");
@@ -279,4 +374,5 @@ async function fetchPublicRepos() {
 
 updateSkillChart();
 initScrollAnimations();
+initDraggableProfile();
 fetchPublicRepos();
